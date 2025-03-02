@@ -222,7 +222,7 @@ let g:indent_guides_start_level = 2  " 从第二层开始可视化显示缩进
 
 "autobackup
 let g:autobackup_backup_dir = "~/.backup/vim"
-let g:autobackup_backup_limit = 128
+let g:autobackup_backup_limit = 32
 
 "git-blame
 nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
