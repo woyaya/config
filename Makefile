@@ -21,7 +21,7 @@ ifeq ($(ROOT_DIR),)
 endif
 export ROOT_DIR
 
-MODULES:=$(shell ls */.list 2>/dev/null | sed 's/\/.*//')
+MODULES:=$(shell ls */list 2>/dev/null | sed 's/\/.*//')
 
 BACKUP=$(addprefix backup_,$(MODULES))
 RESTORE=$(addprefix restore_,$(MODULES))
@@ -29,29 +29,30 @@ RESTORE=$(addprefix restore_,$(MODULES))
 .PHONY: backup $(BACKUP)
 backup : $(BACKUP)
 $(BACKUP) : backup_% :
+	@echo "Making $@"
 	@export OS=$(OS);\
 	set -a;\
-	[ -f Scripts/$(OS).mk ] && . Scripts/$(OS).mk;\
-	[ -f $*/.config ] && . $*/.config;\
-	[ -f $*/.config_$(OS) ] && . $*/.config_$(OS);\
+	[ -f $*/config ] && . $*/config;\
+	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
 	set +a;\
 	Scripts/Sync.sh \
-		-H $(HOME) -l $*/.list -b $* -r $(ROOT_DIR)\
-		-P $*/.prebackup.sh -P $*/.prebackup_$(OS).sh \
-		-p $*/.postbackup.sh -p $*/.postbackup_$(OS).sh
+		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
+		-P $*/prebackup.sh -P $*/prebackup_$(OS).sh \
+		-p $*/postbackup.sh -p $*/postbackup_$(OS).sh
 
 .PHONY: restore $(RESTORE)
 restore : $(RESTORE)
 $(RESTORE) : restore_% :
+	@echo "Making $@"
 	@export OS=$(OS);\
 	set -a;\
-	[ -f $*/.config ] && . $*/.config;\
-	[ -f $*/.config_$(OS) ] && . $*/.config_$(OS);\
+	[ -f $*/config ] && . $*/config;\
+	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
 	set +a;\
 	Scripts/Sync.sh -R\
-		-H $(HOME) -l $*/.list -b $* -r $(ROOT_DIR)\
-		-P $*/.prerestore.sh -P $*/.prerestore_$(OS).sh \
-		-p $*/.postrestore.sh -p $*/.postrestore_$(OS).sh
+		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
+		-P $*/prerestore.sh -P $*/prerestore_$(OS).sh \
+		-p $*/postrestore.sh -p $*/postrestore_$(OS).sh
 
 .PHONY: help
 help:
