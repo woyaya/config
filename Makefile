@@ -37,8 +37,8 @@ $(BACKUP) : backup_% :
 	set +a;\
 	Scripts/Sync.sh \
 		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/prebackup.sh -P $*/prebackup_$(OS).sh \
-		-p $*/postbackup.sh -p $*/postbackup_$(OS).sh
+		-P $*/pre_backup.sh -P $*/pre_backup_$(OS).sh \
+		-p $*/post_backup.sh -p $*/post_backup_$(OS).sh
 
 .PHONY: restore $(RESTORE)
 restore : $(RESTORE)
@@ -51,8 +51,8 @@ $(RESTORE) : restore_% :
 	set +a;\
 	Scripts/Sync.sh -R\
 		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/prerestore.sh -P $*/prerestore_$(OS).sh \
-		-p $*/postrestore.sh -p $*/postrestore_$(OS).sh
+		-P $*/pre_restore.sh -P $*/pre_restore_$(OS).sh \
+		-p $*/post_restore.sh -p $*/post_restore_$(OS).sh
 
 .PHONY: help
 help:
