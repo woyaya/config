@@ -1,5 +1,6 @@
 
 OS:=$(shell uname)
+NODE:=$(shell uname -n)
 USER:=$(shell whoami)
 IGNORE_LIST="Scripts"
 
@@ -37,8 +38,8 @@ $(BACKUP) : backup_% :
 	set +a;\
 	Scripts/Sync.sh \
 		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/pre_backup.sh -P $*/pre_backup_$(OS).sh \
-		-p $*/post_backup.sh -p $*/post_backup_$(OS).sh
+		-P $*/pre_backup.sh  -P $*/pre_backup_$(OS).sh  -P $*/pre_backup_$(NODE).sh \
+		-p $*/post_backup.sh -p $*/post_backup_$(OS).sh -p $*/post_backup_$(NODE).sh
 
 .PHONY: restore $(RESTORE)
 restore : $(RESTORE)
@@ -51,8 +52,8 @@ $(RESTORE) : restore_% :
 	set +a;\
 	Scripts/Sync.sh -R\
 		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/pre_restore.sh -P $*/pre_restore_$(OS).sh \
-		-p $*/post_restore.sh -p $*/post_restore_$(OS).sh
+		-P $*/pre_restore.sh  -P $*/pre_restore_$(OS).sh  -P $*/pre_restore_$(NODE).sh \
+		-p $*/post_restore.sh -p $*/post_restore_$(OS).sh -p $*/post_restore_$(NODE).sh
 
 .PHONY: help
 help:
@@ -64,6 +65,7 @@ help:
 	@echo ""
 	@echo "Variables:"
 	@echo "  OS: $(OS)"
+	@echo "  NODE: $(NODE)"
 	@echo "  ROOT: $(ROOT)"
 	@echo "  User: $(_USER)"
 	@echo "  Home: $(HOME)"
