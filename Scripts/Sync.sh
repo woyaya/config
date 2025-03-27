@@ -93,24 +93,25 @@ call_scripts(){
 
 rsync_version(){
 	[ -z "$1" ] && {
-		rsync --version | sed '/version/!d;s/.*version \([0-9]\)\.\([0-9]\).* protocol.*/\1\2/'
+		rsync --version | sed '/rsync *version/!d;s/.*version \([0-9]\)\.\([0-9]\).*/\1\2/'
 		return
 	}
-	ssh -n $1 'rsync --version 2>/dev/null' | sed '/version/!d;s/.*version \([0-9]\)\.\([0-9]\).* protocol.*/\1\2/'
+	ssh -n $1 'rsync --version 2>/dev/null' | sed '/rsync *version/!d;s/.*version \([0-9]\)\.\([0-9]\).*/\1\2/'
 }
-rsync_atime(){
-	local rversion
-	[ -n "$1" ] && rversion=`rsync_version "$1"` || rversion="$LVERSION"
-	[ -z "$rversion" ] && return 1
-	[ "$rversion" -ge 32 -a "$LVERSION" -ge 32 ] && {
-		echo "--open-noatime"
+rsync_params(){
+	local version
+	version=`rsync_version`
+	[ -z "$version" ] && return 1
+	[ "$version" -ge 32 ] && {
+		echo "--open-noatime -A $@"
 		return 0
 	}
-	[ "$rversion" -lt 32 -a "$LVERSION" -lt 32 ] && {
-		echo "--noatime"
+	[ "$version" -ge 31 ] && {
+		echo "--noatime -A $@"
 		return 0
 	}
 	#unmatch version, 'atime' is not supported
+	echo "--executability -p "
 	return 0;
 }
 #line_fail line descript
@@ -209,7 +210,6 @@ check_execs rsync logger sed awk wc || FAIL "Incomplete executes"
 
 #trap cleanup EXIT
 
-LVERSION=`rsync_version`
 [ "$LOG_LEVEL" -ge "5" ] && VERBOSE="-v" || VERBOSE="-q"
 
 if [ "$REVERT" = "1" ];then
@@ -223,7 +223,7 @@ call_scripts ${PREPROCESS[@]}
 
 FAIL=""
 SUCC=""
-PARAMS="-HA -a $PRESERVE $VERBOSE $DRYRUN `rsync_atime`"
+PARAMS="-H -a $VERBOSE $DRYRUN `rsync_params $PRESERVE`"
 INF "Read list from $LIST"
 while read LINE; do
 	DBG "Process line: $LINE"
