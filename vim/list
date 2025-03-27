@@ -6,4 +6,4 @@
 #    /: normal absolute path
 #    #: annotate, ignore
 ~/.vimrc
-~/.vim,--exclude=plugged --exclude=autoload
+~/.vim,--exclude=plugged --exclude=autoload --exclude=plugin --exclude=doc --exclude=.netrwhist
