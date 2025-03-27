@@ -1,0 +1,9 @@
+# config file format
+# AbsolutePath,[Additional rsync parameters]
+# AbsolutePath start with:
+#    ~: replaced with "home" directory
+#    $xxx: replaced with varable in environment
+#    /: normal absolute path
+#    #: annotate, ignore
+~/.ssh/config
+/etc/ssh/ssh_config

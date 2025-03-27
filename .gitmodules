@@ -1,0 +1,3 @@
+[submodule "Scripts/functions"]
+	path = Scripts/functions
+	url = https://github.com/woyaya/functions.git
