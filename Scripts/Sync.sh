@@ -223,7 +223,7 @@ call_scripts ${PREPROCESS[@]}
 
 FAIL=""
 SUCC=""
-PARAMS="-HA --mkpath -a $PRESERVE $VERBOSE $DRYRUN `rsync_atime`"
+PARAMS="-HA -a $PRESERVE $VERBOSE $DRYRUN `rsync_atime`"
 INF "Read list from $LIST"
 while read LINE; do
 	DBG "Process line: $LINE"
@@ -249,6 +249,8 @@ while read LINE; do
 	else
 		src=`get_path_real "$path"`
 		dist=`get_path_virtual "$path"`
+		[ -d "$src" ] && mkdir -p $dist
+		[ -f "$src" ] && mkdir -p `dirname $dist`
 	fi
 	INF "Src: $src, dist: $dist, params: $params"
 	[ -z "$src" -o -z "$dist" ] && {
