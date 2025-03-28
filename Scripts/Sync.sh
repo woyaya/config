@@ -134,8 +134,9 @@ line_succ(){
 	SUCC="$SUCC*<$_line>: $_desc"
 }
 
-LIST=""
-REVERT=""
+unset REVERT
+
+LIST=()
 PREPROCESS=()
 POSTPROCESS=()
 ############################
@@ -155,7 +156,7 @@ while getopts ":B:r:b:H:l:P:p:RnvLD" opt; do
 			export HOME
 		;;
 		l)
-			LIST=$OPTARG
+			LIST+=("$OPTARG")
 		;;
 		P)
 			PREPROCESS+=("$OPTARG")
@@ -200,8 +201,8 @@ COMMON=$BASE/common.sh
 export COMMON
 . $COMMON
 
-[ -z "$LIST" ] && USAGE $0
-[ ! -f "$LIST" ] && FAIL "Can not found list file: $LIST"
+#[ -z "${LIST[@]}" ] && USAGE $0
+#[ ! -f "$LIST" ] && FAIL "Can not found list file: $LIST"
 mkdir -p $BACKUP
 
 check_dirs $BASE $ROOT $HOME || FAIL "Incomplete dirs" 
@@ -224,57 +225,63 @@ call_scripts ${PREPROCESS[@]}
 FAIL=""
 SUCC=""
 PARAMS="-H -a $VERBOSE $DRYRUN `rsync_params $PRESERVE`"
-INF "Read list from $LIST"
-while read LINE; do
-	DBG "Process line: $LINE"
-	[ -z "$LINE" ] && continue
-	line=`echo "$LINE" | sed 's/^ *//;/^#/d'`
-	DBG "Ignore annotation: $line"
-	[ -z "$line" ] && continue
-	path=`echo "$line" | awk -F, '{print $1}' | sed 's/^ *//;s/,.*//'`
-	params=`echo "$line" | awk -F, '{print $2}' | sed 's/.*,//;s/ *$//'`
-	check=`echo "$line" | awk -F, '{print $3}'`
-	DBG "Path: $path, params: $params, check: $check"
-	[ -n "$check" ] && {
-		line_fail "$line" "Invalid line(Too many comma)"
+for list in ${LIST[@]};do
+	INF "Process list start: $list"
+	[ ! -f "$list" ] && {
+		WRN "List file not exist: $list"
 		continue
 	}
-	check_variables path || {
-		line_fail "$line" "Invalid line(Too less comma)"
-		continue
-	}
-	if [ "$REVERT" = "1" ];then
-		dist=`get_path_real "$path"`
-		src=`get_path_virtual "$path"`
-	else
-		src=`get_path_real "$path"`
-		dist=`get_path_virtual "$path"`
-		[ -d "$src" ] && mkdir -p $dist
+	while read LINE; do
+		DBG "Process line: $LINE"
+		[ -z "$LINE" ] && continue
+		line=`echo "$LINE" | sed 's/^ *//;/^#/d'`
+		DBG "Ignore annotation: $line"
+		[ -z "$line" ] && continue
+		path=`echo "$line" | awk -F, '{print $1}' | sed 's/^ *//;s/,.*//'`
+		params=`echo "$line" | awk -F, '{print $2}' | sed 's/.*,//;s/ *$//'`
+		check=`echo "$line" | awk -F, '{print $3}'`
+		DBG "Path: $path, params: $params, check: $check"
+		[ -n "$check" ] && {
+			line_fail "$line" "Invalid line(Too many comma)"
+			continue
+		}
+		check_variables path || {
+			line_fail "$line" "Invalid line(Too less comma)"
+			continue
+		}
+		if [ "$REVERT" = "1" ];then
+			dist=`get_path_real "$path"`
+			src=`get_path_virtual "$path"`
+		else
+			src=`get_path_real "$path"`
+			dist=`get_path_virtual "$path"`
+			[ -d "$src" ] && mkdir -p $dist
+			[ -f "$src" ] && mkdir -p `dirname $dist`
+		fi
+		INF "Src: $src, dist: $dist, params: $params"
+		[ -z "$src" -o -z "$dist" ] && {
+			line_fail "$LINE" "Can not find dir: <$src>,<$dist>"
+			continue
+		}
+		[ -d "$src" -a "/" != "${src: -1}" ] && src="$src/"
 		[ -f "$src" ] && mkdir -p `dirname $dist`
-	fi
-	INF "Src: $src, dist: $dist, params: $params"
-	[ -z "$src" -o -z "$dist" ] && {
-		line_fail "$LINE" "Can not find dir: <$src>,<$dist>"
-		continue
-	}
-	[ -d "$src" -a "/" != "${src: -1}" ] && src="$src/"
-	[ -f "$src" ] && mkdir -p `dirname $dist`
-	params="$params $PARAMS"
-	LOG "$ACTIION from $src to $dist with params($params)"
-	# Backup to local device
-	LOG "rsync $params $src $dist"
-	rsync $params $src $dist
-	if [ $? = 0 ];then
-		line_succ "$LINE" "$ACTIION $src to $dist success"
-	else
-		line_fail "$LINE" "$ACTIION $src to $dist fail"
-	fi
-done <$LIST
+		params="$params $PARAMS"
+		LOG "$ACTIION from $src to $dist with params($params)"
+		# Backup to local device
+		LOG "rsync $params $src $dist"
+		rsync $params $src $dist
+		if [ $? = 0 ];then
+			line_succ "$LINE" "$ACTIION $src to $dist success"
+		else
+			line_fail "$LINE" "$ACTIION $src to $dist fail"
+		fi
+	done <$list
+	INF "Process list end: $list"
+done
 
-DBG "Process end: $LIST"
 [ -n "$SUCC" ] && INF "$ACTIION succ list: `echo "$SUCC" | sed 's/\*</\n\t</g'`"
 [ -n "$FAIL" ] && ERR "$ACTIION fail list: `echo "$FAIL" | sed 's/\*</\n\t</g'`"
 
 call_scripts ${POSTPROCESS[@]}
 
-INF "$ACTIION done: $LIST"
+INF "$ACTIION done: ${LIST[@]}"

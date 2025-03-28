@@ -22,7 +22,12 @@ ifeq ($(ROOT_DIR),)
 endif
 export ROOT_DIR
 
-MODULES:=$(shell ls */list 2>/dev/null | sed 's/\/.*//')
+MODULES:=$(sort $(shell ls */list* 2>/dev/null | sed 's/\/.*//'))
+$(foreach name,$(MODULES),$(eval $(name)_list=$(wildcard $(name)/list $(name)/list_$(OS) $(name)/list_$(NODE))))
+$(foreach name,$(MODULES),$(eval $(name)_pre_backup=$(wildcard $(name)/pre_backup $(name)/pre_backup_$(OS) $(name)/pre_backup_$(NODE))))
+$(foreach name,$(MODULES),$(eval $(name)_post_backup=$(wildcard $(name)/post_backup $(name)/post_backup_$(OS) $(name)/post_backup_$(NODE))))
+$(foreach name,$(MODULES),$(eval $(name)_pre_restore=$(wildcard $(name)/pre_restore $(name)/pre_restore_$(OS) $(name)/pre_restore_$(NODE))))
+$(foreach name,$(MODULES),$(eval $(name)_post_restore=$(wildcard $(name)/post_restore $(name)/post_restore_$(OS) $(name)/post_restore_$(NODE))))
 
 BACKUP=$(addprefix backup_,$(MODULES))
 RESTORE=$(addprefix restore_,$(MODULES))
@@ -37,9 +42,10 @@ $(BACKUP) : backup_% :
 	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
 	set +a;\
 	Scripts/Sync.sh \
-		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/pre_backup.sh  -P $*/pre_backup_$(OS).sh  -P $*/pre_backup_$(NODE).sh \
-		-p $*/post_backup.sh -p $*/post_backup_$(OS).sh -p $*/post_backup_$(NODE).sh
+		-H $(HOME) -b $* -r $(ROOT_DIR)\
+		$(addprefix -l ,$($*_list)) \
+		$(addprefix -P ,$($*_pre_backup)) \
+		$(addprefix -p ,$($*_post_backup))
 
 .PHONY: restore $(RESTORE)
 restore : $(RESTORE)
@@ -51,9 +57,10 @@ $(RESTORE) : restore_% :
 	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
 	set +a;\
 	Scripts/Sync.sh -R\
-		-H $(HOME) -l $*/list -b $* -r $(ROOT_DIR)\
-		-P $*/pre_restore.sh  -P $*/pre_restore_$(OS).sh  -P $*/pre_restore_$(NODE).sh \
-		-p $*/post_restore.sh -p $*/post_restore_$(OS).sh -p $*/post_restore_$(NODE).sh
+		-H $(HOME) -b $* -r $(ROOT_DIR)\
+		$(addprefix -l ,$($*_list)) \
+		$(addprefix -P ,$($*_pre_restore)) \
+		$(addprefix -p ,$($*_post_restore))
 
 .PHONY: help
 help:
