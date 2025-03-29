@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 _PATH=`realpath $0`
 _DIR=`dirname $_PATH`
-sed -i 's/^set-option -g history-limit /#set-option -g history-limit /' ${_DIR}/HOME/.tmux.conf
+[ -z "$(sed --version 2>/dev/null | sed '/GNU.*sed/!d')" ] && sedi=(-i '') || sedi=(-i)
+sed "${sedi[@]}" -e 's/^set-option -g history-limit /#set-option -g history-limit /' ${_DIR}/HOME/.tmux.conf

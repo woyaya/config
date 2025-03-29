@@ -1,2 +1,3 @@
-#!/bin/sh
-sed -i 's/^#set-option -g history-limit /set-option -g history-limit /' ~/.tmux.conf
+#!/bin/bash
+[ -z "$(sed --version 2>/dev/null | sed '/GNU.*sed/!d')" ] && sedi=(-i '') || sedi=(-i)
+sed ${sedi[@]} -e 's/^#set-option -g history-limit /set-option -g history-limit /' ~/.tmux.conf
