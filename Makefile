@@ -16,13 +16,15 @@ ifeq ($(_USER),)
   _USER=$(USER)
 endif
 
+MODULES_ALL:=$(sort $(shell ls */list* 2>/dev/null | sed 's/\/.*//'))
 -include Scripts/$(OS).mk
-ifeq ($(ROOT_DIR),)
-  ROOT_DIR="/"
+-include Include/$(NODE).mk
+ifneq ($(IGNORES),)
+  MODULES:=$(filter-out $(IGNORES),$(MODULES_ALL))
+else
+  MODULES=$(MODULES_ALL)
 endif
-export ROOT_DIR
 
-MODULES:=$(sort $(shell ls */list* 2>/dev/null | sed 's/\/.*//'))
 $(foreach name,$(MODULES),$(eval $(name)_list=$(wildcard $(name)/list $(name)/list_$(OS) $(name)/list_$(NODE))))
 $(foreach name,$(MODULES),$(eval $(name)_pre_backup=$(wildcard $(name)/pre_backup $(name)/pre_backup_$(OS) $(name)/pre_backup_$(NODE))))
 $(foreach name,$(MODULES),$(eval $(name)_post_backup=$(wildcard $(name)/post_backup $(name)/post_backup_$(OS) $(name)/post_backup_$(NODE))))
@@ -31,6 +33,11 @@ $(foreach name,$(MODULES),$(eval $(name)_post_restore=$(wildcard $(name)/post_re
 
 BACKUP=$(addprefix backup_,$(MODULES))
 RESTORE=$(addprefix restore_,$(MODULES))
+
+ifeq ($(ROOT_DIR),)
+  ROOT_DIR="/"
+endif
+export ROOT_DIR
 
 .PHONY: backup $(BACKUP)
 backup : $(BACKUP)
@@ -73,10 +80,12 @@ help:
 	@echo "Variables:"
 	@echo "  OS: $(OS)"
 	@echo "  NODE: $(NODE)"
-	@echo "  ROOT: $(ROOT)"
+	@echo "  Root: $(ROOT)"
 	@echo "  User: $(_USER)"
 	@echo "  Home: $(HOME)"
 	@echo "  Root dir: $(ROOT_DIR)"
+	@echo "  Modules(all): $(MODULES_ALL)"
+	@echo "  Ignores: $(IGNORES)"
 	@echo "  Modules: $(MODULES)"
 	@echo "  Backup actions: backup $(BACKUP)"
 	@echo "  Restore actions: restore $(RESTORE)"
