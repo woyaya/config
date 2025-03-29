@@ -18,7 +18,7 @@ endif
 
 MODULES_ALL:=$(sort $(shell ls */list* 2>/dev/null | sed 's/\/.*//'))
 -include Scripts/$(OS).mk
--include Include/$(NODE).mk
+-include Includes/$(NODE).mk
 ifneq ($(IGNORES),)
   MODULES:=$(filter-out $(IGNORES),$(MODULES_ALL))
 else
