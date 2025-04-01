@@ -7,7 +7,7 @@ IGNORE_LIST="Scripts"
 _USER=
 ifneq ($(ROOT),1)
   ifneq ($(SUDO_USER),)
-    HOME:=$(shell sudo su $(SUDO_USER) sh -c 'echo $$HOME')
+    HOME:=$(shell sudo su $(SUDO_USER) -c 'echo $$HOME')
     export HOME
     _USER=$(SUDO_USER)
   endif
