@@ -254,6 +254,7 @@ for list in ${LIST[@]};do
 		if [ "$REVERT" = "1" ];then
 			dist=`get_path_real "$path"`
 			src=`get_path_virtual "$path"`
+			[ "${path::1}" = "~" ] && params="${params} -g -o" || params="${params} --no-o --no-g"
 		else
 			src=`get_path_real "$path"`
 			dist=`get_path_virtual "$path"`
@@ -267,7 +268,7 @@ for list in ${LIST[@]};do
 		}
 		[ -d "$src" -a "/" != "${src: -1}" ] && src="$src/"
 		[ -f "$src" ] && mkdir -p `dirname $dist`
-		params="$params $PARAMS"
+		params="$PARAMS $params"
 		LOG "$ACTIION from $src to $dist with params($params)"
 		# Backup to local device
 		LOG "rsync $params $src $dist"
