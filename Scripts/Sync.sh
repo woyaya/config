@@ -103,11 +103,13 @@ rsync_params(){
 	version=`rsync_version`
 	[ -z "$version" ] && return 1
 	[ "$version" -ge 32 ] && {
-		echo "--open-noatime -A $@"
+		#echo -n "--open-noatime "
+		echo "-A $@"
 		return 0
 	}
 	[ "$version" -ge 31 ] && {
-		echo "--noatime -A $@"
+		#echo -n "--noatime "
+		echo "-A $@"
 		return 0
 	}
 	#unmatch version, 'atime' is not supported
