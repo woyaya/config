@@ -2,8 +2,16 @@
 OS:=$(shell uname)
 NODE:=$(shell uname -n)
 USER:=$(shell whoami)
-IGNORE_LIST="Scripts"
-
+ifeq ($(OS),Linux)
+  OS:=$(shell uname -o | sed 's/.*\///')
+endif
+ifeq ($(NODE),localhost)
+  ifneq ($(HOSTNAME),)
+    NODE:=$(HOSTNAME)
+  else
+    NODE:=$(shell getprop net.hostname 2>/dev/null)
+  endif
+endif
 _USER=
 ifneq ($(ROOT),1)
   ifneq ($(SUDO_USER),)

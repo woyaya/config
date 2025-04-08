@@ -227,6 +227,8 @@ call_scripts ${PREPROCESS[@]}
 FAIL=""
 SUCC=""
 PARAMS="-H -a $VERBOSE $DRYRUN `rsync_params $PRESERVE`"
+# The Android version of rsync does not support the "-A" and "-X" parameters
+[ "$OS" = "Android" ] && PARAMS=`echo "$PARAMS" | sed 's/-A\b//g;s/-X\b//g'`
 for list in ${LIST[@]};do
 	INF "Process list start: $list"
 	[ ! -f "$list" ] && {
