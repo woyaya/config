@@ -57,6 +57,7 @@ $(BACKUP) : backup_% :
 	set -a;\
 	[ -f $*/config ] && . $*/config;\
 	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
+	[ -f $*/config_$(NODE) ] && . $*/config_$(NODE);\
 	set +a;\
 	Scripts/Sync.sh \
 		-H $(HOME) -b $* -r $(ROOT_DIR)\
@@ -72,6 +73,7 @@ $(RESTORE) : restore_% :
 	set -a;\
 	[ -f $*/config ] && . $*/config;\
 	[ -f $*/config_$(OS) ] && . $*/config_$(OS);\
+	[ -f $*/config_$(NODE) ] && . $*/config_$(NODE);\
 	set +a;\
 	Scripts/Sync.sh -R\
 		-H $(HOME) -b $* -r $(ROOT_DIR)\
