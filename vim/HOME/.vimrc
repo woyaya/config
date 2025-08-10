@@ -187,7 +187,7 @@ call plug#begin('~/.vim/plugged')
  Plug 'Yggdroot/LeaderF'
  Plug 'vim-airline/vim-airline'
  Plug 'vim-airline/vim-airline-themes'
- Plug 'Yggdroot/indentLine'
+" Plug 'Yggdroot/indentLine'
  Plug 'mhinz/vim-startify'
 " Plug 'neoclide/coc.nvim', {'branch': 'release'}
  Plug 'majutsushi/tagbar'
@@ -216,9 +216,9 @@ let g:coc_global_extensions = ['coc-json', 'coc-git', 'coc-yaml', 'coc-clangd']
 "source ~/.vim/coc_nvim.vimrc
 
 "indentLine
-let g:indentLine_enabled = 1
-let g:indent_guides_guide_size = 1  " 指定对齐线的尺寸
-let g:indent_guides_start_level = 2  " 从第二层开始可视化显示缩进
+"let g:indentLine_enabled = 1
+"let g:indent_guides_guide_size = 1  " 指定对齐线的尺寸
+"let g:indent_guides_start_level = 2  " 从第二层开始可视化显示缩进
 
 "autobackup
 let g:autobackup_backup_dir = "~/.backup/vim"
