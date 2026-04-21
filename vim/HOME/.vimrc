@@ -6,7 +6,9 @@ set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936
 set fileencodings=utf-8
 
 "设置终端编码"
-set termencoding=utf-8
+if !has('nvim')
+  set termencoding=utf-8
+endif
 
 "设置语言编码"
 "set langmenu=zh_CN.UTF-8
@@ -15,7 +17,7 @@ set termencoding=utf-8
 "显示tab分隔符.
 "注意：
 "    <<<下面这行命令的最后有一个空格>>>
-set list lcs=tab:\|\ 
+"set list lcs=tab:\|\ 
 
 "自动开启语法高亮"
 syntax on
@@ -143,6 +145,14 @@ highlight FoldColumn term=bold cterm=bold ctermbg=black ctermfg=None
 
 "默认打开所有折叠
 set foldlevel=100
+
+" Vim + Neovim 通用：在 terminal 模式下按 <Esc><Esc> 退出到 Normal
+if has('nvim')
+  tnoremap <Esc><Esc> <C-\><C-n>
+else
+  tnoremap <Esc><Esc> <C-w>N
+endif
+
 """""""""""""""""""""""""""""""
 """=>缓冲区buffer快捷键<="""
 """""""""""""""""""""""""""""""

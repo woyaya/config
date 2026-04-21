@@ -13,6 +13,18 @@ let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu S
 let g:Lf_PreviewResult = {'Function': 1, 'BufTag': 0 }
 
 let g:Lf_ShortcutF = "<leader>ff"
+
+" ================= LeaderF 隐藏文件配置 =================
+" 1. 在搜文件名时 (:LeaderfFile)，显示隐藏文件
+let g:Lf_ShowHidden = 1
+" 2. 哪怕显示了隐藏文件，也要死死屏蔽掉 .git 目录，防止污染结果
+let g:Lf_WildIgnore = {
+  \ 'dir': ['.svn','.git','.hg','.vscode','.idea'],
+  \ 'file': ['*.sw?','~$*','*.bak','*.o','*.py[co]','*.DS_Store']
+  \}
+" 3. 在搜代码内容时 (:LeaderfRg)，也开启搜索隐藏文件
+let g:Lf_RgConfig = ["--hidden"]
+
 noremap <leader>fb :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
 noremap <leader>fm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
 noremap <leader>ft :<C-U><C-R>=printf("Leaderf bufTag %s", "")<CR><CR>
@@ -38,3 +50,5 @@ noremap <leader>fp :<C-U><C-R>=printf("Leaderf gtags --previous %s", "")<CR><CR>
 noremap <C-F> :<C-U><C-R>=printf("Leaderf! --auto-preview rg -s -g '!tags' -g '!*.d' --iglob '!build' -e '\\b%s\\b'", expand("<cword>"))<CR><CR>
 " search visually selected text literally
 xnoremap <C-F> :<C-U><C-R>=printf("Leaderf! --auto-preview rg -s -g '!tags' -g '!*.d' --iglob '!build' -e %s ", leaderf#Rg#visual())<CR><CR>
+" prepare search command and waiting for text
+nnoremap <leader>f :Leaderf! --auto-preview rg -s -g '!tags' -g '!*.d' --iglob '!build' -e 
